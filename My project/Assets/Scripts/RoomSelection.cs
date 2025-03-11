@@ -11,32 +11,37 @@ public class RoomSelection : MonoBehaviour
     public PathFinder AIPathFinder;
     public CameraController cameraController;
 
+    private List<string> roomCodes = new List<string>
+    {
+        "2Q048", "2Q049", "2Q050", "2Q047", "2Q052"
+    };
     // Start is called before the first frame update
     void Start()
     {
-        OpenDropdown(); // Fill dropdown with room names
+        OpenDropdown();
     }
 
     void OpenDropdown()
     {
         dropdown.ClearOptions();
-        List<string> roomNames = new List<string>();
-
-        foreach (Transform room in roomTargets)
-        {
-            roomNames.Add(room.name); // Add room names to dropdown
-        }
-
-        dropdown.AddOptions(roomNames);
+        dropdown.AddOptions(roomCodes);
     }
     public void SetDestination()
     {
         if (AIPathFinder != null && roomTargets.Length > 0)
         {
             int selectedRoom = dropdown.value;
-            AIPathFinder.SetNewDestination(roomTargets[selectedRoom].position);
+            string selectedRoomCode = roomCodes[selectedRoom];
+
+            Debug.Log($"Setting destination for room: {selectedRoomCode}");
+
+            AIPathFinder.SetNewDestination(roomTargets[selectedRoom].position, selectedRoomCode);
 
             cameraController.LockCursor();
+        }
+        else
+        {
+            Debug.LogError("SetDestination: AIPathFinder or roomTargets is null/empty!");
         }
     }
 }
