@@ -10,6 +10,8 @@ public class PathFinder : MonoBehaviour
     private bool hasReached = false;
     public CameraController cameraController;
 
+    public TimetableLinkOpener timetableButton;
+
     public Text roomDescriptionText;
     public GameObject descriptionPanel;
 
@@ -19,12 +21,12 @@ public class PathFinder : MonoBehaviour
 {
     //Teaching and Learning Spaces
     {"2Q048", "Type: Standard Teaching Room\nDepartment: Engineering, Design, and Mathematics\nSeats: Estimated 40-60\nPurpose: Used for regular classes, lectures, and seminars."},
-    {"2Q049", "Type: Large Lecture Hall\nDepartment: Central Exams and Teaching Timetabling Services\nSeats: 100+ tiered seating\nPurpose: Used for large lectures, exams, and events."},
-    {"2Q050", "Type: Large Teaching Room\nDepartment: Faculty of Environment and Technology\nSeats: 80+\nPurpose: Large lecture-based classes and interactive teaching."},
+    {"2Q049", "Type: Large Lecture Hall\nDepartment: Central Exams and Teaching Timetabling Services\nSeats: 100+ tiered seating\nPurpose: Used for large lectures, exams, and events.\nView Room Timetable:(go.uwe.ac.uk/rm_2Q049_FR)"},
+    {"2Q050", "Type: Large Teaching Room\nDepartment: Faculty of Environment and Technology\nSeats: 80+\nPurpose: Large lecture-based classes and interactive teaching.\nView Room Timetable:(go.uwe.ac.uk/rm_2Q050_FR)"},
     {"2Q047", "Type: Medium-Sized Teaching Room\nDepartment: Geography and Environmental Management\nSeats: 15-25\nPurpose: Small group lectures and discussions."},
     {"2Q046", "Type: Seminar Room\nDepartment: Geography and Environmental Management\nSeats: 15-25\nPurpose: Tutorials, project discussions, and small-group teaching."},
-    {"2Q043", "Type: Standard Teaching Room\nDepartment: Computer Science and Creative Technology\nSeats: 30-40\nPurpose: Regular IT-focused lectures."},
-    {"2Q042", "Type: Standard Classroom\nDepartment: Geography and Environmental Management\nSeats: 50+\nPurpose: Used for geography/environmental sciences lectures."},
+    {"2Q043", "Type: Standard Teaching Room\nDepartment: Computer Science and Creative Technology\nSeats: 30-40\nPurpose: Regular IT-focused lectures.\nView Room Timetable:(go.uwe.ac.uk/rm_2Q043_FR)"},
+    {"2Q042", "Type: Standard Classroom\nDepartment: Geography and Environmental Management\nSeats: 50+\nPurpose: Used for geography/environmental sciences lectures.\nView Room Timetable:(go.uwe.ac.uk/rm_2Q042_FR)"},
 
     //Storage and Utility Rooms
     {"2Q041", "Type: Storage Room\nDepartment: Faculty of Environment and Technology\nPurpose: Storage for academic materials and equipment."},
@@ -34,9 +36,9 @@ public class PathFinder : MonoBehaviour
 
     //Computer Labs
     {"2Q052", "Type: IT Lab\nDepartment: Computer Science and Creative Technology\nSeats: 30+ workstations\nPurpose: Programming, software training, and hands-on IT learning."},
-    {"2Q053", "Type: IT Lab\nDepartment: Computer Science and Creative Technology\nSeats: 25+ workstations\nPurpose: Practical IT-related sessions."},
+    {"2Q053", "Type: IT Lab\nDepartment: Computer Science and Creative Technology\nSeats: 25+ workstations\nPurpose: Practical IT-related sessions.\nView Room Timetable:(go.uwe.ac.uk/rm_2Q053_FR)"},
     {"2Q012", "Type: Computer Lab\nSeats: 40+ IT workstations\nPurpose: Computer Science training."},
-    {"2Q028", "Type: Computer Lab\nSeats: 35+\nPurpose: Software and IT courses."},
+    {"2Q028", "Type: Computer Lab\nSeats: 35+\nPurpose: Software and IT courses.\nView Room Timetable:(go.uwe.ac.uk/rm_2Q028_FR)"},
 
     //Administrative Offices
     {"2Q045", "Type: Faculty Office\nDepartment: Computer Science and Creative Technology\nSeats: Office desks for faculty members\nPurpose: Faculty workspace and administrative tasks."},
@@ -62,9 +64,8 @@ public class PathFinder : MonoBehaviour
     {"2Q006A", "Type: Dining Area\nDepartment: Hospitality Services\nSeats: 20+ seating arrangements\nPurpose: Food service for students and staff."},
 
     //Other Spaces
-    {"2Q029", "Type: Laboratory\nPurpose: Geography and Environmental research."}
+    {"2Q029", "Type: Laboratory\nPurpose: Geography and Environmental research.\nView Room Timetable:(go.uwe.ac.uk/rm_2Q029_FR)"}
 };
-
 
     void Start()
     {
@@ -87,7 +88,6 @@ public class PathFinder : MonoBehaviour
         }
     }
 
-
     public void SetNewDestination(Vector3 newTarget, string roomCode)
     {
         if (agent != null)
@@ -108,7 +108,20 @@ public class PathFinder : MonoBehaviour
 
         if (roomDescriptions.ContainsKey(currentRoomCode))
         {
-            roomDescriptionText.text = roomDescriptions[currentRoomCode];
+            string description = roomDescriptions[currentRoomCode];
+            string timetableURL = ExtractTimetableLink(description);
+
+            if (!string.IsNullOrEmpty(timetableURL))
+            {
+                description = description.Replace($"\nView Room Timetable:({timetableURL})", ""); 
+            }
+
+            roomDescriptionText.text = description;
+
+            if (timetableButton != null)
+            {
+                timetableButton.SetTimetableURL(timetableURL);
+            }
         }
         else
         {
@@ -127,5 +140,25 @@ public class PathFinder : MonoBehaviour
         {
             cameraController.UnlockCursor();
         }
+    }
+
+    private string ExtractTimetableLink(string description)
+    {
+        int startIndex = description.IndexOf("(go.uwe.ac.uk/");
+        if (startIndex == -1)
+        {
+            return null;
+        }
+
+        startIndex += 1; // Move past '('
+
+        int endIndex = description.IndexOf(")", startIndex);
+        if (endIndex == -1)
+        {
+            return null;
+        }
+
+        string extractedURL = description.Substring(startIndex, endIndex - startIndex);
+        return extractedURL;
     }
 }

@@ -399,6 +399,7 @@
 "Assets/Scripts/CameraController.cs"
 "Assets/Scripts/PathFinder.cs"
 "Assets/Scripts/RoomSelection.cs"
+"Assets/Scripts/TimetableLinkOpener.cs"
 -langversion:9.0
 
 /deterministic
