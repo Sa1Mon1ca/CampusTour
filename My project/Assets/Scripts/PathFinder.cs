@@ -28,16 +28,9 @@ public class PathFinder : MonoBehaviour
     {"2Q043", "Type: Standard Teaching Room\nDepartment: Computer Science and Creative Technology\nSeats: 30-40\nPurpose: Regular IT-focused lectures.\nView Room Timetable:(go.uwe.ac.uk/rm_2Q043_FR)"},
     {"2Q042", "Type: Standard Classroom\nDepartment: Geography and Environmental Management\nSeats: 50+\nPurpose: Used for geography/environmental sciences lectures.\nView Room Timetable:(go.uwe.ac.uk/rm_2Q042_FR)"},
 
-    //Storage and Utility Rooms
-    {"2Q041", "Type: Storage Room\nDepartment: Faculty of Environment and Technology\nPurpose: Storage for academic materials and equipment."},
-    {"2Q044A", "Type: Storage Room\nDepartment: Geography and Environmental Management\nPurpose: Storage for departmental materials."},
-    {"2Q044B", "Type: Storage Room\nDepartment: Hospitality Services\nPurpose: Storage for café and hospitality equipment."},
-    {"2Q054", "Type: Cleaning Services Store\nDepartment: Cleaning Services\nPurpose: Storage of cleaning supplies."},
-
     //Computer Labs
     {"2Q052", "Type: IT Lab\nDepartment: Computer Science and Creative Technology\nSeats: 30+ workstations\nPurpose: Programming, software training, and hands-on IT learning."},
     {"2Q053", "Type: IT Lab\nDepartment: Computer Science and Creative Technology\nSeats: 25+ workstations\nPurpose: Practical IT-related sessions.\nView Room Timetable:(go.uwe.ac.uk/rm_2Q053_FR)"},
-    {"2Q012", "Type: Computer Lab\nSeats: 40+ IT workstations\nPurpose: Computer Science training."},
     {"2Q028", "Type: Computer Lab\nSeats: 35+\nPurpose: Software and IT courses.\nView Room Timetable:(go.uwe.ac.uk/rm_2Q028_FR)"},
 
     //Administrative Offices
@@ -46,22 +39,12 @@ public class PathFinder : MonoBehaviour
     {"2Q034", "Type: IT Technicians’ Workspace\nDepartment: IT Services Technicians\nSeats: Office desks for IT staff\nPurpose: Administrative work and tech support."},
     {"2Q033", "Type: Student Information Desk\nDepartment: IT Services\nSeats: Service desk area\nPurpose: Student queries, IT support, and information assistance."},
 
-    //Student Support and Consultation Spaces
-    {"2Q056", "Type: Student Support Advice Information Point\nDepartment: Student Support Advice\nPurpose: Guidance and assistance for students."},
-    {"2Q056A", "Type: Private Consultation Room\nDepartment: Student Support Advice\nPurpose: One-on-one student support meetings."},
-    {"2Q056B", "Type: Private Consultation Room\nDepartment: Student Support Advice\nPurpose: Personal advisory sessions."},
-    {"2Q056C", "Type: Private Consultation Room\nDepartment: Student Support Advice\nPurpose: Academic and personal guidance sessions."},
-
     //Facilities and Utility Spaces
     {"2Q032", "Type: Utility Room\nDepartment: Estates Balance\nPurpose: Housing technical and mechanical systems."},
-    {"2Q055", "Type: Restroom\nDepartment: Estates Balance²\nPurpose: Restroom for staff and students."},
-    {"2Q002", "Type: Mail Sorting Room\nDepartment: Faculty of Environment and Technology\nPurpose: Sorting and handling university mail."},
-    {"2Q001A", "Type: IT Plant Room\nDepartment: IT Services\nPurpose: Houses IT-related infrastructure."},
-
+    
     //Learning and Social Spaces
     {"2Q008", "Type: Study Area\nDepartment: Library Services\nSeats: 50+ desks and study pods\nPurpose: Individual and group study."},
     {"2Q030", "Type: Library Study Space\nDepartment: Library Services\nSeats: 60+ seating areas\nPurpose: Research and independent study."},
-    {"2Q006A", "Type: Dining Area\nDepartment: Hospitality Services\nSeats: 20+ seating arrangements\nPurpose: Food service for students and staff."},
 
     //Other Spaces
     {"2Q029", "Type: Laboratory\nPurpose: Geography and Environmental research.\nView Room Timetable:(go.uwe.ac.uk/rm_2Q029_FR)"}
@@ -92,7 +75,17 @@ public class PathFinder : MonoBehaviour
     {
         if (agent != null)
         {
-            agent.SetDestination(newTarget);
+            NavMeshHit hit;
+            if (NavMesh.SamplePosition(newTarget, out hit, 2.0f, NavMesh.AllAreas))
+            {
+                agent.SetDestination(hit.position);
+                Debug.Log($"Destination set for {roomCode}: {hit.position}");
+            }
+            else
+            {
+                Debug.LogError($"Destination for {roomCode} is not on the NavMesh!");
+            }
+
             hasReached = false;
             descriptionPanel.SetActive(false);
             currentRoomCode = roomCode;
